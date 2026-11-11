@@ -1,0 +1,25 @@
+{
+  "name": "uams-web/patches-orchestra-testbench-core",
+  "description": "Patches UAMS-Web repositories apply to orchestra/testbench-core",
+  "type": "library",
+  "require": {
+    "orchestra/testbench-core": "11.6.0"
+  },
+  "extra": {
+    "patches": {
+      "orchestra/testbench-core": {
+        "Give each parallel test worker its own service manifest (temporary; see UAMS-Web/patches-orchestra-testbench-core#1)": "vendor/uams-web/patches-orchestra-testbench-core/patches/testbench-parallel-services-manifest.patch"
+      }
+    }
+  },
+  "keywords": [
+    "composer",
+    "patches",
+    "testbench"
+  ],
+  "support": {
+    "issues": "https://github.com/UAMS-Web/patches-orchestra-testbench-core/issues",
+    "source": "https://github.com/UAMS-Web/patches-orchestra-testbench-core"
+  },
+  "license": "MIT"
+}
