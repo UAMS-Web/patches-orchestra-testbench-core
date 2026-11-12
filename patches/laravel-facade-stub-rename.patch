@@ -1,0 +1,21 @@
+diff --git a/src/Illuminate/Foundation/AliasLoader.php b/src/Illuminate/Foundation/AliasLoader.php
+index 7270e9f..af5b939 100755
+--- a/src/Illuminate/Foundation/AliasLoader.php
++++ b/src/Illuminate/Foundation/AliasLoader.php
+@@ -115,7 +115,15 @@ protected function ensureFacadeExists($alias)
+ 
+         file_put_contents($tempPath, $stub);
+ 
+-        rename($tempPath, $path);
++        // On Windows, renaming over a stub another process has open fails. Every process writes
++        // identical content, so a stub that now exists is the stub we wanted.
++        if (! @rename($tempPath, $path)) {
++            @unlink($tempPath);
++
++            if (! is_file($path)) {
++                throw new \RuntimeException("Unable to write the real-time facade stub [{$path}].");
++            }
++        }
+ 
+         return $path;
+     }

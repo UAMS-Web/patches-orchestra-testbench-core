@@ -2,7 +2,7 @@
 
 Patches that UAMS-Web repositories apply to [`orchestra/testbench-core`](https://github.com/orchestral/testbench-core) with [`cweagans/composer-patches`](https://github.com/cweagans/composer-patches) 2.x. One package replaces the copies each repository carried, so a patch is changed once and retires everywhere in one release.
 
-This package pins `orchestra/testbench-core` to exactly `11.6.0`. Every patch is written against that release.
+This package pins `orchestra/testbench-core` to exactly `11.6.0`. Every `orchestra/testbench-core` patch is written against that release. The `laravel/framework` patch is written against `v13.42.0`; the package requires `^13.42.0`, and the patch fails to apply if a later release changes the code it touches.
 
 ## Install
 
@@ -30,6 +30,7 @@ Applied in this order, which is the order in `composer.json`. A later patch is c
 
 - **`testbench-parallel-services-manifest.patch`**: Give each parallel test worker its own service manifest. Every worker boots the same Testbench skeleton and rewrites its `bootstrap/cache/services.php`; on Windows, replacing a file another process has open fails with "Access is denied", failing whichever test was booting. Testbench names the package manifest per worker (`test_{token}_packages.php`), and the second patch below makes that apply under Pest; this names the service manifest the same way (`test_{token}_services.php`) when a parallel run has no `APP_SERVICES_CACHE` of its own. A parallel run is recognised by the worker token (`ParallelTesting::token()`), not by Testbench's `in_parallel_testing()`: Pest sets `LARAVEL_PARALLEL_TESTING` only in the parent process's `$_ENV`, so it is absent in the workers and `in_parallel_testing()` is false there. Serial runs keep the default path. A consumer that sets `APP_SERVICES_CACHE` itself keeps its value, so its own override can be removed after this package is adopted. Upstream offer: UAMS-Web/aether-multisite-forms#98.
 - **`testbench-parallel-packages-manifest.patch`**: Make Testbench's own per-worker package manifest (`test_{token}_packages.php`) apply under Pest. It is chosen with `in_parallel_testing()`, which is false in Pest workers (see the first patch), so every worker shared `bootstrap/cache/packages.php` and a cold run on Windows could fail with "Access is denied". The patch chooses the name from the worker token. Serial runs keep the default path.
+- **`laravel-facade-stub-rename.patch`** (`laravel/framework`): Stop parallel workers failing on a real-time facade stub. `AliasLoader::ensureFacadeExists()` writes each stub to a temporary file and renames it over the shared `storage/framework/cache/facade-{hash}.php`; on Windows the rename fails when another worker has the destination open, failing whichever test resolved the facade. Every worker writes identical content, so the patch deletes its temporary file and uses the stub that now exists, and throws only if there is none.
 
 Each description names the ticket that tracks the upstream fix, where there is one.
 
@@ -43,7 +44,7 @@ Each description names the ticket that tracks the upstream fix, where there is o
 
 ## Verifying the set
 
-Apply the 2 patches in order to the `v11.6.0` tag of `orchestra/testbench-core` with `git apply -p1`. Applying either patch a second time must fail.
+Apply the first 2 patches in order to the `v11.6.0` tag of `orchestra/testbench-core`, and the third to the `v13.42.0` tag of `laravel/framework`, each with `git apply -p1`. Applying a patch a second time must fail.
 
 ## License
 

@@ -3,6 +3,7 @@
   "description": "Patches UAMS-Web repositories apply to orchestra/testbench-core",
   "type": "library",
   "require": {
+    "laravel/framework": "^13.42.0",
     "orchestra/testbench-core": "11.6.0"
   },
   "extra": {
@@ -10,6 +11,9 @@
       "orchestra/testbench-core": {
         "Give each parallel test worker its own service manifest (temporary; see UAMS-Web/patches-orchestra-testbench-core#1)": "vendor/uams-web/patches-orchestra-testbench-core/patches/testbench-parallel-services-manifest.patch",
         "Give each parallel test worker its own package manifest under Pest (temporary; see UAMS-Web/patches-orchestra-testbench-core#5)": "vendor/uams-web/patches-orchestra-testbench-core/patches/testbench-parallel-packages-manifest.patch"
+      },
+      "laravel/framework": {
+        "Tolerate a lost facade stub rename on Windows (temporary; see UAMS-Web/patches-orchestra-testbench-core#6)": "vendor/uams-web/patches-orchestra-testbench-core/patches/laravel-facade-stub-rename.patch"
       }
     }
   },
