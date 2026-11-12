@@ -28,7 +28,8 @@ Patch paths are relative to the consumer's root and start `vendor/uams-web/patch
 
 Applied in this order, which is the order in `composer.json`. A later patch is cut against the output of the earlier ones, so none is reordered without re-cutting those after it.
 
-- **`testbench-parallel-services-manifest.patch`**: Give each parallel test worker its own service manifest. Every worker boots the same Testbench skeleton and rewrites its `bootstrap/cache/services.php`; on Windows, replacing a file another process has open fails with "Access is denied", failing whichever test was booting. Testbench already names the package manifest per worker (`test_{token}_packages.php`); this names the service manifest the same way (`test_{token}_services.php`) when a parallel run has no `APP_SERVICES_CACHE` of its own. A parallel run is recognised by the worker token (`ParallelTesting::token()`), not by Testbench's `in_parallel_testing()`: Pest sets `LARAVEL_PARALLEL_TESTING` only in the parent process's `$_ENV`, so it is absent in the workers and `in_parallel_testing()` is false there (this is also why Testbench's own `test_{token}_packages.php` naming does not take effect under `pest --parallel`; this patch does not change that). Serial runs keep the default path. A consumer that sets `APP_SERVICES_CACHE` itself keeps its value, so its own override can be removed after this package is adopted. Upstream offer: UAMS-Web/aether-multisite-forms#98.
+- **`testbench-parallel-services-manifest.patch`**: Give each parallel test worker its own service manifest. Every worker boots the same Testbench skeleton and rewrites its `bootstrap/cache/services.php`; on Windows, replacing a file another process has open fails with "Access is denied", failing whichever test was booting. Testbench names the package manifest per worker (`test_{token}_packages.php`), and the second patch below makes that apply under Pest; this names the service manifest the same way (`test_{token}_services.php`) when a parallel run has no `APP_SERVICES_CACHE` of its own. A parallel run is recognised by the worker token (`ParallelTesting::token()`), not by Testbench's `in_parallel_testing()`: Pest sets `LARAVEL_PARALLEL_TESTING` only in the parent process's `$_ENV`, so it is absent in the workers and `in_parallel_testing()` is false there. Serial runs keep the default path. A consumer that sets `APP_SERVICES_CACHE` itself keeps its value, so its own override can be removed after this package is adopted. Upstream offer: UAMS-Web/aether-multisite-forms#98.
+- **`testbench-parallel-packages-manifest.patch`**: Make Testbench's own per-worker package manifest (`test_{token}_packages.php`) apply under Pest. It is chosen with `in_parallel_testing()`, which is false in Pest workers (see the first patch), so every worker shared `bootstrap/cache/packages.php` and a cold run on Windows could fail with "Access is denied". The patch chooses the name from the worker token. Serial runs keep the default path.
 
 Each description names the ticket that tracks the upstream fix, where there is one.
 
@@ -42,7 +43,7 @@ Each description names the ticket that tracks the upstream fix, where there is o
 
 ## Verifying the set
 
-Apply the 1 patch in order to the `v11.6.0` tag of `orchestra/testbench-core` with `git apply -p1`. Applying the first patch a second time must fail.
+Apply the 2 patches in order to the `v11.6.0` tag of `orchestra/testbench-core` with `git apply -p1`. Applying either patch a second time must fail.
 
 ## License
 

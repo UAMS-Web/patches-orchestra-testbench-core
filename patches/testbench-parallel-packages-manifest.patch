@@ -1,0 +1,25 @@
+diff --git a/src/Foundation/PackageManifest.php b/src/Foundation/PackageManifest.php
+index 3e30d55..8f84c20 100644
+--- a/src/Foundation/PackageManifest.php
++++ b/src/Foundation/PackageManifest.php
+@@ -11,7 +11,6 @@ use Orchestra\Testbench\Contracts\TestCase as TestCaseContract;
+ 
+ use function Orchestra\Sidekick\Filesystem\join_paths;
+ use function Orchestra\Sidekick\is_testbench_cli;
+-use function Orchestra\Testbench\in_parallel_testing;
+ use function Orchestra\Testbench\package_path;
+ 
+ /**
+@@ -43,8 +42,10 @@ class PackageManifest extends IlluminatePackageManifest
+      */
+     public function __construct(Filesystem $files, $basePath, $manifestPath, $testbench = null)
+     {
+-        if ($testbench instanceof TestCaseContract && in_parallel_testing()) {
+-            $manifestPath = join_paths(\dirname($manifestPath), 'test_'.ParallelTesting::token().'_packages.php');
++        // Keyed on the worker token, not in_parallel_testing(): Pest sets LARAVEL_PARALLEL_TESTING
++        // in the parent's $_ENV only, so it is absent in the workers and in_parallel_testing() is false.
++        if ($testbench instanceof TestCaseContract && ($token = ParallelTesting::token())) {
++            $manifestPath = join_paths(\dirname($manifestPath), 'test_'.$token.'_packages.php');
+         }
+ 
+         parent::__construct($files, $basePath, $manifestPath);
