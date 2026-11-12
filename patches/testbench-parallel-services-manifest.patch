@@ -1,5 +1,5 @@
 diff --git a/src/Concerns/CreatesApplication.php b/src/Concerns/CreatesApplication.php
-index 85a1657..e1755d2 100644
+index 85a1657..5b16b20 100644
 --- a/src/Concerns/CreatesApplication.php
 +++ b/src/Concerns/CreatesApplication.php
 @@ -10,7 +10,9 @@ use Illuminate\Foundation\Configuration\ApplicationBuilder;
@@ -12,21 +12,15 @@ index 85a1657..e1755d2 100644
  use Illuminate\Support\Facades\RateLimiter;
  use Illuminate\Support\ServiceProvider;
  use Orchestra\Testbench\Attributes\DefineEnvironment;
-@@ -29,6 +31,7 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
- 
- use function Orchestra\Sidekick\after_resolving;
- use function Orchestra\Testbench\default_skeleton_path;
-+use function Orchestra\Testbench\in_parallel_testing;
- use function Orchestra\Testbench\refresh_router_lookups;
- 
- /**
-@@ -343,6 +346,11 @@ trait CreatesApplication
+@@ -343,6 +345,13 @@ trait CreatesApplication
                  : 'Orchestra\Testbench\Bootstrap\LoadConfigurationWithWorkbench'
          );
  
-+        // Give each parallel worker its own service manifest, as the package manifest has
-+        if (in_parallel_testing() && Env::get('APP_SERVICES_CACHE') === null) {
-+            $_SERVER['APP_SERVICES_CACHE'] = $_ENV['APP_SERVICES_CACHE'] = 'bootstrap/cache/test_'.ParallelTesting::token().'_services.php';
++        // Give each parallel worker its own service manifest, as the package manifest has. Keyed
++        // on the worker token, not in_parallel_testing(): Pest sets LARAVEL_PARALLEL_TESTING in
++        // the parent's $_ENV only, so it is absent in the workers and in_parallel_testing() is false.
++        if (($token = ParallelTesting::token()) && Env::get('APP_SERVICES_CACHE') === null) {
++            $_SERVER['APP_SERVICES_CACHE'] = $_ENV['APP_SERVICES_CACHE'] = 'bootstrap/cache/test_'.$token.'_services.php';
 +        }
 +
          PackageManifest::swap($app, $this);
