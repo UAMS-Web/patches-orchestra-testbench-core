@@ -4,6 +4,8 @@ Patches that UAMS-Web repositories apply to [`orchestra/testbench-core`](https:/
 
 This package pins `orchestra/testbench-core` to exactly `11.6.0`. Every `orchestra/testbench-core` patch is written against that release. The `laravel/framework` patch is written against `v13.42.0`; the package requires `^13.42.0`, and the patch fails to apply if a later release changes the code it touches.
 
+The [wiki](https://github.com/UAMS-Web/patches-orchestra-testbench-core/wiki) holds the reference for the patch set, versioning, verification and troubleshooting.
+
 ## Install
 
 This package is read from GitHub with a `vcs` repository, not from Packagist. The consumer's root `composer.json` lists it (Composer reads `repositories` only from the root project):
@@ -34,17 +36,9 @@ Applied in this order, which is the order in `composer.json`. A later patch is c
 
 Each description names the ticket that tracks the upstream fix, where there is one.
 
-## Versioning
+## Versioning and verifying
 
-| Change | Release |
-| --- | --- |
-| A patch's content changes, same upstream pin | patch |
-| A patch is added or retired, or the pin moves within the upstream major | minor |
-| The pin moves to a new upstream major | major |
-
-## Verifying the set
-
-Apply the first 2 patches in order to the `v11.6.0` tag of `orchestra/testbench-core`, and the third to the `v13.42.0` tag of `laravel/framework`, each with `git apply -p1`. Applying a patch a second time must fail.
+How a change to the package is numbered is on the wiki's [Versioning](https://github.com/UAMS-Web/patches-orchestra-testbench-core/wiki/Versioning) page, and how to apply the set to its upstream releases by hand is [Verifying the patch set](https://github.com/UAMS-Web/patches-orchestra-testbench-core/wiki/Verifying-the-patch-set).
 
 ## License
 
