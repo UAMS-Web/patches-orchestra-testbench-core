@@ -36,6 +36,6 @@ Unknown keys, a missing key and a wrong type fail the run with the file named, s
 
 ## Notes on current rows
 
-No rows yet. A row belongs here when an open ticket in this repository waits on an upstream issue or pull request, and the ticket is its tracker. Today no open ticket names one: #1 waits on a fix in `orchestra/testbench-core` but records no upstream number, because the offer (#9) is closed with none posted. When #1 records the upstream pull request, add its row in that change with `composer` set to `orchestra/testbench-core` and `released` set to `true`, tracker `1`.
+- `1-orchestral-testbench-core-443.json`: tracker `1` watches `orchestral/testbench-core#443`, an open issue reporting that parallel workers share `bootstrap/cache/services.php` and Windows runs fail with "Access is denied". When it moves, read the thread on #1 for a fix or a release carrying one. The row has no `composer` key: this repository pins `orchestra/testbench-core` in `composer.json` and carries no `composer.lock`, so the Packagist signal has no locked version to compare against. Two things to follow up when the upstream thread records a pull request: #1 covers three patches but names only this one upstream item, and a `pr` row for the fix takes `released: true`.
 
-Add one line per row here saying what the upstream thread is and what to do when it moves.
+A row belongs here when an open ticket in this repository waits on an upstream issue or pull request, and the ticket is its tracker. Add one line per row saying what the upstream thread is and what to do when it moves.
