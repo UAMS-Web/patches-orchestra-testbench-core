@@ -10,16 +10,21 @@ index 3e30d55..8f84c20 100644
  use function Orchestra\Testbench\package_path;
  
  /**
-@@ -43,8 +42,10 @@ class PackageManifest extends IlluminatePackageManifest
+@@ -43,8 +42,15 @@ class PackageManifest extends IlluminatePackageManifest
       */
      public function __construct(Filesystem $files, $basePath, $manifestPath, $testbench = null)
      {
 -        if ($testbench instanceof TestCaseContract && in_parallel_testing()) {
 -            $manifestPath = join_paths(\dirname($manifestPath), 'test_'.ParallelTesting::token().'_packages.php');
-+        // Keyed on the worker token, not in_parallel_testing(): Pest sets LARAVEL_PARALLEL_TESTING
-+        // in the parent's $_ENV only, so it is absent in the workers and in_parallel_testing() is false.
-+        if ($testbench instanceof TestCaseContract && ($token = ParallelTesting::token())) {
-+            $manifestPath = join_paths(\dirname($manifestPath), 'test_'.$token.'_packages.php');
++        if ($testbench instanceof TestCaseContract) {
++            // The worker is identified by its token alone: Pest and ParaTest set TEST_TOKEN for a
++            // package's workers, but set LARAVEL_PARALLEL_TESTING only for a Laravel application,
++            // so in_parallel_testing() is false for them.
++            $token = rescue(static fn () => ParallelTesting::token(), $_SERVER['TEST_TOKEN'] ?? null, false);
++
++            if (\is_string($token) || \is_int($token)) {
++                $manifestPath = join_paths(\dirname($manifestPath), 'test_'.$token.'_packages.php');
++            }
          }
  
          parent::__construct($files, $basePath, $manifestPath);
